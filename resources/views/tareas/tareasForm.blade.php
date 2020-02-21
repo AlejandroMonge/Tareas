@@ -5,13 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Lista de tareas</div>
+                <div class="card-header">Captura nueva tarea</div>
 
                 <div class="card-body">
-                <a href="{{ action("TareaController@create") }}" class="btn btn-success"> Nueva tarea</a>
-                    <hr>
-                    Lista de tareas
 
+                    Hola
 
                 </div>
             </div>
