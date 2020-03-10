@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Categoria;
 use App\Tarea;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TareaController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except('index');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,8 +23,9 @@ class TareaController extends Controller
     {
         //Recuperar todas las tareas de la base de datos
         //$tarea = consulta
+        $tareas = Tarea::all();
 
-        return view('tareas.tareaIndex');
+        return view('tareas.tareasIndex', compact('tareas'));
 
     }
 
@@ -28,7 +36,8 @@ class TareaController extends Controller
      */
     public function create()
     {
-        return view('tareas.tareasForm');
+        $categorias = Categoria::all()->pluck('nombre_categoria', 'id');
+        return view('tareas.tareasForm', compact('categorias'));
     }
 
     /**
@@ -39,7 +48,31 @@ class TareaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'nombreTarea' => 'required|max:255',
+            'fechaInicio' => 'required|date',
+            'fechaTermino' => 'required|date',
+            'descripcion' => 'required',
+            'prioridad' => 'required|int|min:1|max:10'
+        ]);
+
+        $request->merge(['user_id' => \Auth::id()]);
+        Tarea::create($request->all());
+
+        /*$tarea = new Tarea();
+
+        $tarea->user_id = \Auth::id();
+
+        $tarea->nombreTarea = $request->nombreTarea;
+        $tarea->fechaInicio = $request->fechaInicio;
+        $tarea->fechaTermino = $request->fechaTermino;
+        $tarea->descripcion = $request->descripcion;
+        $tarea->prioridad = $request->prioridad;
+        $tarea->categoria_id = $request->categoria_id;
+
+        $tarea->save();*/
+        return redirect()->route('tarea.index');
     }
 
     /**
@@ -51,6 +84,7 @@ class TareaController extends Controller
     public function show(Tarea $tarea)
     {
         //
+        return view('tareas.tareasShow', compact('tarea'));
     }
 
     /**
@@ -62,6 +96,8 @@ class TareaController extends Controller
     public function edit(Tarea $tarea)
     {
         //
+        $categorias = Categoria::all()->pluck('nombre_categoria', 'id');
+        return view('tareas.tareasForm', compact('tarea','categorias'));
     }
 
     /**
@@ -74,6 +110,27 @@ class TareaController extends Controller
     public function update(Request $request, Tarea $tarea)
     {
         //
+
+        $request->validate([
+            'nombreTarea' => 'required|max:255',
+            'fechaInicio' => 'required|date',
+            'fechaTermino' => 'required|date',
+            'descripcion' => 'required',
+            'prioridad' => 'required|int|min:1|max:10'
+        ]);
+
+        Tarea::where('id', $tarea->id)->update($request->except('_token','_method'));
+
+        /*
+        $tarea->nombreTarea = $request->nombreTarea;
+        $tarea->fechaInicio = $request->fechaInicio;
+        $tarea->fechaTermino = $request->fechaTermino;
+        $tarea->descripcion = $request->descripcion;
+        $tarea->prioridad = $request->prioridad;
+        $tarea->categoria_id = $request->categoria_id;
+
+        $tarea->save();*/
+        return redirect()->route('tarea.show', $tarea->id);
     }
 
     /**
@@ -85,5 +142,7 @@ class TareaController extends Controller
     public function destroy(Tarea $tarea)
     {
         //
+        $tarea->delete();
+        return redirect()->route('tarea.index');
     }
 }

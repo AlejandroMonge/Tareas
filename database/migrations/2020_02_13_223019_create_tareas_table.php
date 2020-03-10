@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use function Psy\debug;
+
 class CreateTareasTable extends Migration
 {
     /**
@@ -19,13 +21,16 @@ class CreateTareasTable extends Migration
             $table->date('fechaInicio');
             $table->date('fechaTermino');
             $table->text('descripcion');
-            $table->unsignedBigInteger('categoriaId');//FK
-            //$table->bigInteger('categoriaId')->unisigned();
             $table->smallInteger('prioridad')->unsigned();
-            $table->string('status');
-            $table->boolean('terminada');
-            $table->unsignedBigInteger('userId');//FK
+            $table->string('status')->default("Iniciada");
+            $table->boolean('terminada')->default(0);
             $table->timestamps();
+
+            //FK
+            $table->unsignedBigInteger('categoria_id');
+            $table->unsignedBigInteger('user_id');
+
+
         });
     }
 
